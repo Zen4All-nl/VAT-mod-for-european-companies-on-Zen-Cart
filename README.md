@@ -1,4 +1,7 @@
 # VAT-mod-for-european-companies-on-Zen-Cart
+
+<h2>!! This code has not been tested yet. Do not use in a live store !!</h2>This mod checks customer's VAT (Value Added Tax) number regarding his country and displays VAT on invoice and packingslip as well as removes tax when shipping to companies in countries within the EU.
+
 This mod checks customer's VAT (Value Added Tax) number regarding his country and displays VAT on invoice and packingslip as well as removes tax when shipping to companies in countries within the EU.
 - Add a text field during account registration and modification...
 - Add shop VAT number on invoice and packing slip
