@@ -31,9 +31,9 @@ if (isset($_POST['action']) && ($_POST['action'] == 'submit')) {
     $process = true;
     if (ACCOUNT_GENDER == 'true') $gender = zen_db_prepare_input($_POST['gender']);
     if (ACCOUNT_COMPANY == 'true') $company = zen_db_prepare_input($_POST['company']);
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 1 of 3 */
     if (ACCOUNT_COMPANY == 'true') $tva_intracom = zen_db_prepare_input($_POST['tva_intracom']);
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 1 of 3 */
     $firstname = zen_db_prepare_input($_POST['firstname']);
     $lastname = zen_db_prepare_input($_POST['lastname']);
     $street_address = zen_db_prepare_input($_POST['street_address']);
@@ -72,7 +72,7 @@ if (isset($_POST['action']) && ($_POST['action'] == 'submit')) {
       $messageStack->add('checkout_address', ENTRY_STREET_ADDRESS_ERROR);
     }
 
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 2 of 3 */
     if (ACCOUNT_COMPANY == 'true') {
       if ( (strlen($company) != 0) && (strlen($company) < ENTRY_COMPANY_MIN_LENGTH) ) {
         $error = true;
@@ -104,7 +104,7 @@ if (isset($_POST['action']) && ($_POST['action'] == 'submit')) {
         }
       }
     }
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 2 of 3 */
 
     if (strlen($city) < ENTRY_CITY_MIN_LENGTH) {
       $error = true;
@@ -183,9 +183,9 @@ if (isset($_POST['action']) && ($_POST['action'] == 'submit')) {
 
       if (ACCOUNT_GENDER == 'true') $sql_data_array[] = array('fieldName'=>'entry_gender', 'value'=>$gender, 'type'=>'enum:m|f');
       if (ACCOUNT_COMPANY == 'true') $sql_data_array[] = array('fieldName'=>'entry_company', 'value'=>$company, 'type'=>'string');
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 3 of 3 */
       if (ACCOUNT_COMPANY == 'true') $sql_data_array[] = array('fieldName'=>'entry_tva_intracom', 'value'=>$tva_intracom, 'type'=>'string');
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 3 of 3 */
       if (ACCOUNT_SUBURB == 'true') $sql_data_array[] = array('fieldName'=>'entry_suburb', 'value'=>$suburb, 'type'=>'string');
       if (ACCOUNT_STATE == 'true') {
         if ($zone_id > 0) {

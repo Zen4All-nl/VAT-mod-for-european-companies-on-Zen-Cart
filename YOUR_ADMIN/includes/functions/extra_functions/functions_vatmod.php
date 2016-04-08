@@ -106,31 +106,32 @@ function zen_verif_tva($num_tva) {
 function zen_get_tva_intracom_array() {
   $intracom_array = array('AT' => 'AT', //Austria
     'BE' => 'BE', //Belgium
+    'BG' => 'BG'); //Bulgaria
+    'CY' => 'CY', //Cyprus
+    'CZ' => 'CZ', //Czech Republic
+    'DE' => 'DE', //Germany
     'DK' => 'DK', //Denmark
+    'EE' => 'EE', //Estonia
+    'ES' => 'ES', //Spain
     'FI' => 'FI', //Finland
     'FR' => 'FR', //France
     'FX' => 'FR', //France metropolitaine
-    'DE' => 'DE', //Germany
-    'GR' => 'EL', //Greece
-    'IE' => 'IE', //Irland
-    'IT' => 'IT', //Italy
-    'LU' => 'LU', //Luxembourg
-    'NL' => 'NL', //Netherlands
-    'PT' => 'PT', //Portugal
-    'ES' => 'ES', //Spain
-    'SE' => 'SE', //Sweden
     'GB' => 'GB', //United Kingdom
-    'CY' => 'CY', //Cyprus
-    'EE' => 'EE', //Estonia
+    'GR' => 'EL', //Greece
     'HU' => 'HU', //Hungary
-    'LV' => 'LV', //Latvia
+    'HR' => 'HR', //Croatia
+    'IE' => 'IE', //Ireland
+    'IT' => 'IT', //Italy
     'LT' => 'LT', //Lithuania
+    'LU' => 'LU', //Luxembourg
+    'LV' => 'LV', //Latvia
     'MT' => 'MT', //Malta
+    'NL' => 'NL', //Netherlands
     'PL' => 'PL', //Poland
-    'SK' => 'SK', //Slovakia
-    'CZ' => 'CZ', //Czech Republic
-    'SI' => 'SI', //Slovania
+    'PT' => 'PT', //Portugal
     'RO' => 'RO', //Romania
-    'BG' => 'BG'); //Bulgaria
+    'SE' => 'SE', //Sweden
+    'SI' => 'SI', //Slovania
+    'SK' => 'SK', //Slovakia
   return $intracom_array;
 }

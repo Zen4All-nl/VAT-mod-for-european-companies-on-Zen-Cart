@@ -3,9 +3,9 @@
  * File contains the order-processing class ("order")
  *
  * @package classes
- * @copyright Copyright 2003-2014 Zen Cart Development Team
+ * @copyright Copyright 2003-2016 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version GIT: $Id: Author: DrByte  Tue Apr 15 15:06:16 2014 -0400 Modified in v1.5.3 $
+ * @version $Id: Author: DrByte  Fri Jan 1 12:23:19 2016 -0500 Modified in v1.5.5 $
  */
 /**
  * order class
@@ -44,6 +44,7 @@ class order extends base {
     $this->notify('NOTIFY_ORDER_BEFORE_QUERY', array(), $order_id);
     if ($this->queryReturnFlag === TRUE) return;
 
+/* BOF TVA_INTRACOM 1 of 13 */
     $order_query = "select customers_id, customers_name, customers_company,
                          customers_street_address, customers_suburb, customers_city,
                          customers_postcode, customers_state, customers_country,
@@ -57,7 +58,8 @@ class order extends base {
                          coupon_code, cc_type, cc_owner, cc_number, cc_expires, currency, currency_value,
                          date_purchased, orders_status, last_modified, order_total, order_tax, ip_address
                         from " . TABLE_ORDERS . "
-                        where orders_id = '" . (int)$order_id . "'"; // TVA_INTRACOM
+                        where orders_id = '" . (int)$order_id . "'";
+/* EOF TVA_INTRACOM 1 of 13 */
 
     $order = $db->Execute($order_query);
 
@@ -108,7 +110,8 @@ class order extends base {
 
     $order_status = $db->Execute($order_status_query);
 
-// TVA_INTRACOM BEGIN // CODE-CHUNK COPPIED DIRECTLY FROM APPROXIMATELY 321 TO 356
+/* BOF TVA_INTRACOM 2 of 13 */
+// CODE-CHUNK COPPIED DIRECTLY FROM APPROXIMATELY 321 TO 356
     switch (STORE_PRODUCT_TAX_BASIS) {
       case 'Shipping':
 
@@ -145,7 +148,7 @@ class order extends base {
       }
       $tax_address = $db->Execute($tax_address_query);
     }
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 2 of 13 */
 
     $this->info = array('currency' => $order->fields['currency'],
                         'currency_value' => $order->fields['currency_value'],
@@ -169,10 +172,10 @@ class order extends base {
     $this->customer = array('id' => $order->fields['customers_id'],
                             'name' => $order->fields['customers_name'],
                             'company' => $order->fields['customers_company'],
-//TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 3 of 13 */
                             'tva_intracom' => $order->fields['billing_tva_intracom'],
                             'tva_intracom_tax' => $this->zen_tva_geo_tax($tax_address->fields['entry_country_id'], $order->fields['billing_company'], $order->fields['billing_tva_intracom']),
-//TVA_INTRACOM END
+/* BOF TVA_INTRACOM 3 of 13 */
                             'street_address' => $order->fields['customers_street_address'],
                             'suburb' => $order->fields['customers_suburb'],
                             'city' => $order->fields['customers_city'],
@@ -199,10 +202,10 @@ class order extends base {
 
     $this->billing = array('name' => $order->fields['billing_name'],
                            'company' => $order->fields['billing_company'],
-//TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 4 of 13 */
                            'tva_intracom' => $order->fields['billing_tva_intracom'],
                            'tva_intracom_tax' => $this->zen_tva_geo_tax($tax_address->fields['entry_country_id'], $order->fields['billing_company'], $order->fields['billing_tva_intracom']),
-//TVA_INTRACOM END
+/* EOF TVA_INTRACOM 4 of 13 */
                            'street_address' => $order->fields['billing_street_address'],
                            'suburb' => $order->fields['billing_suburb'],
                            'city' => $order->fields['billing_city'],
@@ -295,6 +298,7 @@ class order extends base {
 
     $this->content_type = $_SESSION['cart']->get_content_type();
 
+/* BOF TVA_INTRACOM 5 of 13 */
     $customer_address_query = "select c.customers_firstname, c.customers_lastname, c.customers_telephone,
                                     c.customers_email_address, ab.entry_company, ab.entry_tva_intracom, ab.entry_street_address,
                                     ab.entry_suburb, ab.entry_postcode, ab.entry_city, ab.entry_zone_id,
@@ -306,7 +310,8 @@ class order extends base {
                                    left join " . TABLE_COUNTRIES . " co on (ab.entry_country_id = co.countries_id)
                                    where c.customers_id = '" . (int)$_SESSION['customer_id'] . "'
                                    and ab.customers_id = '" . (int)$_SESSION['customer_id'] . "'
-                                   and c.customers_default_address_id = ab.address_book_id"; // TVA_INTRACOM
+                                   and c.customers_default_address_id = ab.address_book_id";
+/* EOF TVA_INTRACOM 5 of 13 */
 
     $customer_address = $db->Execute($customer_address_query);
 
@@ -323,6 +328,7 @@ class order extends base {
 
     $shipping_address = $db->Execute($shipping_address_query);
 
+/* BOF TVA_INTRACOM 6 of 13 */
     $billing_address_query = "select ab.entry_firstname, ab.entry_lastname, ab.entry_company, ab.entry_tva_intracom,
                                    ab.entry_street_address, ab.entry_suburb, ab.entry_postcode,
                                    ab.entry_city, ab.entry_zone_id, z.zone_name, ab.entry_country_id,
@@ -332,52 +338,57 @@ class order extends base {
                                   left join " . TABLE_ZONES . " z on (ab.entry_zone_id = z.zone_id)
                                   left join " . TABLE_COUNTRIES . " c on (ab.entry_country_id = c.countries_id)
                                   where ab.customers_id = '" . (int)$_SESSION['customer_id'] . "'
-                                  and ab.address_book_id = '" . (int)$_SESSION['billto'] . "'"; // TVA_INTRACOM
+                                  and ab.address_book_id = '" . (int)$_SESSION['billto'] . "'";
+/* EOF TVA_INTRACOM 6 of 13 */
 
     $billing_address = $db->Execute($billing_address_query);
 
     // set default tax calculation for not-logged-in visitors
-    $taxCountryId = $taxZoneId = -1;
+      $taxCountryId = $taxZoneId = 0;
 
-    $tax_address_query = '';
-    switch (STORE_PRODUCT_TAX_BASIS) {
-      case 'Shipping':
-      $tax_address_query = "select ab.entry_country_id, ab.entry_zone_id
-                              from " . TABLE_ADDRESS_BOOK . " ab
-                              left join " . TABLE_ZONES . " z on (ab.entry_zone_id = z.zone_id)
-                              where ab.customers_id = '" . (int)$_SESSION['customer_id'] . "'
-                              and ab.address_book_id = '" . (int)($this->content_type == 'virtual' ? $_SESSION['billto'] : $_SESSION['sendto']) . "'";
-      break;
-      case 'Billing':
-      $tax_address_query = "select ab.entry_country_id, ab.entry_zone_id
-                              from " . TABLE_ADDRESS_BOOK . " ab
-                              left join " . TABLE_ZONES . " z on (ab.entry_zone_id = z.zone_id)
-                              where ab.customers_id = '" . (int)$_SESSION['customer_id'] . "'
-                              and ab.address_book_id = '" . (int)$_SESSION['billto'] . "'";
-      break;
-      case 'Store':
-      if ($billing_address->fields['entry_zone_id'] == STORE_ZONE) {
-
-        $tax_address_query = "select ab.entry_country_id, ab.entry_zone_id
-                                from " . TABLE_ADDRESS_BOOK . " ab
-                                left join " . TABLE_ZONES . " z on (ab.entry_zone_id = z.zone_id)
-                                where ab.customers_id = '" . (int)$_SESSION['customer_id'] . "'
-                                and ab.address_book_id = '" . (int)$_SESSION['billto'] . "'";
-      } else {
-        $tax_address_query = "select ab.entry_country_id, ab.entry_zone_id
+      // get tax zone info for logged-in visitors
+      if (isset($_SESSION['customer_id']) && (int)$_SESSION['customer_id'] > 0) {
+          $taxCountryId = $taxZoneId = -1;
+          $tax_address_query = '';
+          switch (STORE_PRODUCT_TAX_BASIS) {
+              case 'Shipping':
+                  $tax_address_query = "select ab.entry_country_id, ab.entry_zone_id
                                 from " . TABLE_ADDRESS_BOOK . " ab
                                 left join " . TABLE_ZONES . " z on (ab.entry_zone_id = z.zone_id)
                                 where ab.customers_id = '" . (int)$_SESSION['customer_id'] . "'
                                 and ab.address_book_id = '" . (int)($this->content_type == 'virtual' ? $_SESSION['billto'] : $_SESSION['sendto']) . "'";
+                  break;
+              case 'Billing':
+                  $tax_address_query = "select ab.entry_country_id, ab.entry_zone_id
+                                from " . TABLE_ADDRESS_BOOK . " ab
+                                left join " . TABLE_ZONES . " z on (ab.entry_zone_id = z.zone_id)
+                                where ab.customers_id = '" . (int)$_SESSION['customer_id'] . "'
+                                and ab.address_book_id = '" . (int)$_SESSION['billto'] . "'";
+                  break;
+              case 'Store':
+                  if ($billing_address->fields['entry_zone_id'] == STORE_ZONE) {
+
+                      $tax_address_query = "select ab.entry_country_id, ab.entry_zone_id
+                                  from " . TABLE_ADDRESS_BOOK . " ab
+                                  left join " . TABLE_ZONES . " z on (ab.entry_zone_id = z.zone_id)
+                                  where ab.customers_id = '" . (int)$_SESSION['customer_id'] . "'
+                                  and ab.address_book_id = '" . (int)$_SESSION['billto'] . "'";
+                  } else {
+                      $tax_address_query = "select ab.entry_country_id, ab.entry_zone_id
+                                  from " . TABLE_ADDRESS_BOOK . " ab
+                                  left join " . TABLE_ZONES . " z on (ab.entry_zone_id = z.zone_id)
+                                  where ab.customers_id = '" . (int)$_SESSION['customer_id'] . "'
+                                  and ab.address_book_id = '" . (int)($this->content_type == 'virtual' ? $_SESSION['billto'] : $_SESSION['sendto']) . "'";
+                  }
+          }
+          if ($tax_address_query != '') {
+              $tax_address = $db->Execute($tax_address_query);
+              if ($tax_address->recordCount() > 0) {
+                  $taxCountryId = $tax_address->fields['entry_country_id'];
+                  $taxZoneId = $tax_address->fields['entry_zone_id'];
+              }
+          }
       }
-    }
-    if ($tax_address_query != '') {
-      $tax_address = $db->Execute($tax_address_query);
-      if ($tax_address->recordCount() > 0) {
-        $taxCountryId = $tax_address->fields['entry_country_id'];
-        $taxZoneId = $tax_address->fields['entry_zone_id'];
-      }
-    }
 
     $class =& $_SESSION['payment'];
 
@@ -420,8 +431,8 @@ class order extends base {
     //echo $_SESSION['payment'];
     /*
     // this is set above to the module filename it should be set to the module title like Checks/Money Order rather than moneyorder
-    if (isset($$_SESSION['payment']) && is_object($$_SESSION['payment'])) {
-    $this->info['payment_method'] = $$_SESSION['payment']->title;
+    if (isset(${$_SESSION['payment']}) && is_object(${$_SESSION['payment']})) {
+    $this->info['payment_method'] = ${$_SESSION['payment']}->title;
     }
     */
 
@@ -444,10 +455,10 @@ class order extends base {
     $this->customer = array('firstname' => $customer_address->fields['customers_firstname'],
                             'lastname' => $customer_address->fields['customers_lastname'],
                             'company' => $customer_address->fields['entry_company'],
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 7 of 13 */
                             'tva_intracom' => $billing_address->fields['entry_tva_intracom'], // ->fields !?
                             'tva_intracom_tax' => $this->zen_tva_geo_tax($tax_address->fields['entry_country_id'], $billing_address->fields['entry_company'], $billing_address->fields['entry_tva_intracom']),
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 7 of 13 */
                             'street_address' => $customer_address->fields['entry_street_address'],
                             'suburb' => $customer_address->fields['entry_suburb'],
                             'city' => $customer_address->fields['entry_city'],
@@ -475,10 +486,10 @@ class order extends base {
     $this->billing = array('firstname' => $billing_address->fields['entry_firstname'],
                            'lastname' => $billing_address->fields['entry_lastname'],
                            'company' => $billing_address->fields['entry_company'],
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 8 of 13 */
                            'tva_intracom' => $billing_address->fields['entry_tva_intracom'],
                            'tva_intracom_tax' => $this->zen_tva_geo_tax($tax_address->fields['entry_country_id'], $billing_address->fields['entry_company'], $billing_address->fields['entry_tva_intracom']),
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 8 of 13 */
                            'street_address' => $billing_address->fields['entry_street_address'],
                            'suburb' => $billing_address->fields['entry_suburb'],
                            'city' => $billing_address->fields['entry_city'],
@@ -492,11 +503,11 @@ class order extends base {
     $index = 0;
     $products = $_SESSION['cart']->get_products();
     for ($i=0, $n=sizeof($products); $i<$n; $i++) {
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 9 of 13 */
       $tva_geo_tax = $this->billing['tva_intracom_tax'];
       $tva_tax = $tva_geo_tax? zen_get_tax_rate ($products[$i]['tax_class_id'], $tax_address->fields['entry_country_id'], $tax_address->fields['entry_zone_id']): 0;
-      $tva_tax_description = $tva_geo_tax? zen_get_tax_description($products[$i]['tax_class_id'], $tax_address->fields['entry_country_id'], $tax_address->fields['entry_zone_id']): 0;
-// TVA_INTRACOM END
+      $tva_tax_description = $tva_geo_tax ? zen_get_tax_description($products[$i]['tax_class_id'], $taxCountryId, $taxZoneId) : 0;
+/* EOF TVA_INTRACOM 9 of 13 */
       if (($i/2) == floor($i/2)) {
         $rowClass="rowEven";
       } else {
@@ -507,14 +518,13 @@ class order extends base {
                                       'name' => $products[$i]['name'],
                                       'model' => $products[$i]['model'],
                                       'tax_groups'=>$taxRates,
-// TVA_INTRACOM REPLACE BEGIN
+/* BOF TVA_INTRACOM 10 of 13 */
                                       'tax' => $tva_tax,
-
-//                                      'tax_description' => zen_get_tax_description($products[$i]['tax_class_id'], $tax_address->fields['entry_country_id'], $tax_address->fields['entry_zone_id']),
+//                                      'tax_description' => zen_get_tax_description($products[$i]['tax_class_id'], $taxCountryId, $taxZoneId),
                                       'tax_description' => $tva_tax_description,
-// TVA_INTRACOM REPLACE END
+/* EOF TVA_INTRACOM 10 of 13 */
                                       'price' => $products[$i]['price'],
-                                      'final_price' => $products[$i]['price'] + $_SESSION['cart']->attributes_price($products[$i]['id']),
+                                      'final_price' => zen_round($products[$i]['price'] + $_SESSION['cart']->attributes_price($products[$i]['id']), $decimals),
                                       'onetime_charges' => $_SESSION['cart']->attributes_price_onetime_charges($products[$i]['id'], $products[$i]['quantity']),
                                       'weight' => $products[$i]['weight'],
                                       'products_priced_by_attribute' => $products[$i]['products_priced_by_attribute'],
@@ -524,14 +534,14 @@ class order extends base {
                                       'id' => $products[$i]['id'],
                                       'rowClass' => $rowClass);
 
-      if (STORE_PRODUCT_TAX_BASIS == 'Shipping' && stristr($_SESSION['shipping']['id'], 'storepickup') == TRUE) 
+      if (STORE_PRODUCT_TAX_BASIS == 'Shipping' && isset($_SESSION['shipping']['id']) && stristr($_SESSION['shipping']['id'], 'storepickup') == TRUE) 
       {
         $taxRates = zen_get_multiple_tax_rates($products[$i]['tax_class_id'], STORE_COUNTRY, STORE_ZONE);
         $this->products[$index]['tax'] = zen_get_tax_rate($products[$i]['tax_class_id'], STORE_COUNTRY, STORE_ZONE);
       } else 
       {
-        $taxRates = zen_get_multiple_tax_rates($products[$i]['tax_class_id'], $tax_address->fields['entry_country_id'], $tax_address->fields['entry_zone_id']);
-        $this->products[$index]['tax'] = zen_get_tax_rate($products[$i]['tax_class_id'], $tax_address->fields['entry_country_id'], $tax_address->fields['entry_zone_id']);
+          $taxRates = zen_get_multiple_tax_rates($products[$i]['tax_class_id'], $taxCountryId, $taxZoneId);
+          $this->products[$index]['tax'] = zen_get_tax_rate($products[$i]['tax_class_id'], $taxCountryId, $taxZoneId);
       }
 
       $this->notify('NOTIFY_ORDER_CART_ADD_PRODUCT_LIST', array('index'=>$index, 'products'=>$products[$i]));
@@ -585,10 +595,18 @@ class order extends base {
       // add onetime charges here
       //$_SESSION['cart']->attributes_price_onetime_charges($products[$i]['id'], $products[$i]['quantity'])
 
+      /**************************************
+       * Check for external tax handling code
+       **************************************/
+      $this->use_external_tax_handler_only = FALSE;
+      $this->notify('NOTIFY_ORDER_CART_EXTERNAL_TAX_HANDLING', array(), $index, $taxCountryId, $taxZoneId);
+
+      if ($this->use_external_tax_handler_only == FALSE) {
       /*********************************************
        * Calculate taxes for this product
        *********************************************/
-/* genuine code from 1.5.4
+/* BOF TVA_INTRACOM 11 of 13 */
+/* genuine code from 1.5.5
       $shown_price = (zen_add_tax($this->products[$index]['final_price'] * $this->products[$index]['qty'], $this->products[$index]['tax']))
       + zen_add_tax($this->products[$index]['onetime_charges'], $this->products[$index]['tax']);
       $this->info['subtotal'] += $shown_price;
@@ -650,10 +668,11 @@ class order extends base {
       } else {
         $this->info['tax_groups'][$products_tax_description] = $tax_add;
       }
-// TVA_INTRACOM REPLACE END
+/* EOF TVA_INTRACOM 11 of 13 */
       /*********************************************
        * END: Calculate taxes for this product
        *********************************************/
+    }
       $index++;
     }
 
@@ -698,7 +717,7 @@ class order extends base {
     }
     $this->notify('NOTIFY_ORDER_CART_ORDERSTATUS');
 
-    if ($_SESSION['shipping']['id'] == 'free_free') {
+    if (isset($_SESSION['shipping']['id']) && $_SESSION['shipping']['id'] == 'free_free') {
       $this->info['shipping_module_code'] = $_SESSION['shipping']['id'];
     }
 
@@ -713,9 +732,9 @@ class order extends base {
     $sql_data_array = array('customers_id' => $_SESSION['customer_id'],
                             'customers_name' => $this->customer['firstname'] . ' ' . $this->customer['lastname'],
                             'customers_company' => $this->customer['company'],
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 12 of 13 */
                             'billing_tva_intracom' => $this->billing['tva_intracom'],
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 12 of 13 */
                             'customers_street_address' => $this->customer['street_address'],
                             'customers_suburb' => $this->customer['suburb'],
                             'customers_city' => $this->customer['city'],
@@ -761,12 +780,9 @@ class order extends base {
                             'ip_address' => $_SESSION['customers_ip_address'] . ' - ' . $_SERVER['REMOTE_ADDR']
                             );
 
-
     zen_db_perform(TABLE_ORDERS, $sql_data_array);
-
     $insert_id = $db->Insert_ID();
-
-    $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', array_merge(array('orders_id' => $insert_id, 'shipping_weight' => $_SESSION['cart']->weight), $sql_data_array));
+    $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_HEADER', array_merge(array('orders_id' => $insert_id, 'shipping_weight' => $_SESSION['cart']->weight), $sql_data_array), $insert_id);
 
     for ($i=0, $n=sizeof($zf_ot_modules); $i<$n; $i++) {
       $sql_data_array = array('orders_id' => $insert_id,
@@ -777,8 +793,8 @@ class order extends base {
                               'sort_order' => $zf_ot_modules[$i]['sort_order']);
 
       zen_db_perform(TABLE_ORDERS_TOTAL, $sql_data_array);
-
-      $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', $sql_data_array);
+      $ot_insert_id = $db->insert_ID();
+      $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDERTOTAL_LINE_ITEM', $sql_data_array, $ot_insert_id);
     }
 
     $customer_notification = (SEND_EMAILS == 'true') ? '1' : '0';
@@ -789,8 +805,8 @@ class order extends base {
                             'comments' => $this->info['comments']);
 
     zen_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
-
-    $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_COMMENT', $sql_data_array);
+    $osh_insert_id = $db->insert_ID();
+    $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ORDER_COMMENT', $sql_data_array, $osh_insert_id);
 
     return $insert_id;
 
@@ -813,7 +829,7 @@ class order extends base {
       $custom_insertable_text = '';
 
       $this->doStockDecrement = (STOCK_LIMITED == 'true');
-      $this->notify('NOTIFY_ORDER_PROCESSING_STOCK_DECREMENT_INIT', array(), $this->products[$i], $i);
+      $this->notify('NOTIFY_ORDER_PROCESSING_STOCK_DECREMENT_INIT', array('i'=>$i), $this->products[$i], $i);
       // Stock Update - Joao Correia
       if ($this->doStockDecrement) {
         if (DOWNLOAD_ENABLED == 'true') {
@@ -893,7 +909,7 @@ class order extends base {
 
       $order_products_id = $db->Insert_ID();
 
-      $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', array_merge(array('orders_products_id' => $order_products_id), $sql_data_array));
+      $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_PRODUCT_LINE_ITEM', array_merge(array('orders_products_id' => $order_products_id, 'i' => $i), $sql_data_array), $order_products_id);
 
       $this->notify('NOTIFY_ORDER_PROCESSING_CREDIT_ACCOUNT_UPDATE_BEGIN');
       $order_total_modules->update_credit_account($i);//ICW ADDED FOR CREDIT CLASS SYSTEM
@@ -974,10 +990,9 @@ class order extends base {
                                   'products_prid' => $this->products[$i]['id']
                                   );
 
-
           zen_db_perform(TABLE_ORDERS_PRODUCTS_ATTRIBUTES, $sql_data_array);
-
-          $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM', $sql_data_array);
+          $opa_insert_id = $db->insert_ID();
+          $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_LINE_ITEM', array_merge(array('orders_products_attributes_id' => $opa_insert_id), $sql_data_array), $opa_insert_id);
 
           if ((DOWNLOAD_ENABLED == 'true') && isset($attributes_values->fields['products_attributes_filename']) && zen_not_null($attributes_values->fields['products_attributes_filename'])) {
             $sql_data_array = array('orders_id' => $zf_insert_id,
@@ -989,8 +1004,8 @@ class order extends base {
                                     );
 
             zen_db_perform(TABLE_ORDERS_PRODUCTS_DOWNLOAD, $sql_data_array);
-
-            $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_DOWNLOAD_LINE_ITEM', $sql_data_array);
+            $opd_insert_id = $db->insert_ID();
+            $this->notify('NOTIFY_ORDER_DURING_CREATE_ADDED_ATTRIBUTE_DOWNLOAD_LINE_ITEM', $sql_data_array, $opd_insert_id);
           }
           $this->products_ordered_attributes .= "\n\t" . $attributes_values->fields['products_options_name'] . ' ' . zen_decode_specialchars($this->products[$i]['attributes'][$j]['value']);
         }
@@ -1020,8 +1035,8 @@ class order extends base {
 
       // update totals counters
       $this->total_weight += ($this->products[$i]['qty'] * $this->products[$i]['weight']);
-      $this->total_tax += zen_calculate_tax($total_products_price * $this->products[$i]['qty'], $products_tax);
-      $this->total_cost += $total_products_price;
+      $this->total_tax += zen_calculate_tax($this->products[$i]['final_price'] * $this->products[$i]['qty'], $this->products[$i]['tax']);
+      $this->total_cost += $this->products[$i]['final_price'] + $this->products[$i]['onetime_charges'];
 
       $this->notify('NOTIFY_ORDER_PROCESSING_ONE_TIME_CHARGES_BEGIN', $i);
 
@@ -1109,6 +1124,8 @@ class order extends base {
       $html_msg['ORDER_COMMENTS'] = '';
     }
 
+    $this->notify('NOTIFY_ORDER_EMAIL_BEFORE_PRODUCTS', array(), $email_order, $html_msg);
+
     //products area
     $email_order .= EMAIL_TEXT_PRODUCTS . "\n" .
     EMAIL_SEPARATOR . "\n" .
@@ -1167,7 +1184,7 @@ class order extends base {
     // include copyright
     if (defined('EMAIL_FOOTER_COPYRIGHT')) $email_order .= "\n-----\n" . EMAIL_FOOTER_COPYRIGHT . "\n\n";
 
-    while (strstr($email_order, '&nbsp;')) $email_order = str_replace('&nbsp;', ' ', $email_order);
+    $email_order = str_replace('&nbsp;', ' ', $email_order);
 
     $html_msg['EMAIL_FIRST_NAME'] = $this->customer['firstname'];
     $html_msg['EMAIL_LAST_NAME'] = $this->customer['lastname'];
@@ -1191,17 +1208,17 @@ class order extends base {
 
       // Add extra heading stuff via observer class
       $this->extra_header_text = '';
-      $this->notify('NOTIFY_ORDER_INVOICE_CONTENT_FOR_ADDITIONAL_EMAILS', array('zf_insert_id' => $zf_insert_id, 'text_email' => $email_order, 'html_email' => $html_msg));
+      $this->notify('NOTIFY_ORDER_INVOICE_CONTENT_FOR_ADDITIONAL_EMAILS', $zf_insert_id, $email_order, $html_msg);
       $email_order = $this->extra_header_text . $email_order;
       $html_msg['EMAIL_TEXT_HEADER'] = nl2br($this->extra_header_text) . $html_msg['EMAIL_TEXT_HEADER'];
 
       zen_mail('', SEND_EXTRA_ORDER_EMAILS_TO, SEND_EXTRA_NEW_ORDERS_EMAILS_TO_SUBJECT . ' ' . EMAIL_TEXT_SUBJECT . EMAIL_ORDER_NUMBER_SUBJECT . $zf_insert_id,
       $email_order . $extra_info['TEXT'], STORE_NAME, EMAIL_FROM, $html_msg, 'checkout_extra', $this->attachArray, $this->customer['firstname'] . ' ' . $this->customer['lastname'], $this->customer['email_address']);
     }
-    $this->notify('NOTIFY_ORDER_AFTER_SEND_ORDER_EMAIL', array($zf_insert_id, $email_order, $extra_info, $html_msg));
+    $this->notify('NOTIFY_ORDER_AFTER_SEND_ORDER_EMAIL', $zf_insert_id, $email_order, $extra_info, $html_msg);
   }
 
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 13 of 13 */
   function zen_get_country_geo_zone_id($country_id){
     global $db;
     $country_geo_zone_query = "select geo_zone_id from " . TABLE_ZONES_TO_GEO_ZONES . " where zone_country_id = '" . (int)$country_id . "' limit 1";
@@ -1225,5 +1242,5 @@ class order extends base {
       return false;
     }
   }
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 13 of 13 */
 }

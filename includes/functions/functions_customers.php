@@ -38,9 +38,9 @@
 
     $address_format = $db->Execute($address_format_query);
     $company = zen_output_string_protected($address['company']);
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 1 of 2 */
     $tva_intracom = zen_output_string_protected($address['tva_intracom']);
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 1 of 2 */
     if (isset($address['firstname']) && zen_not_null($address['firstname'])) {
       $firstname = zen_output_string_protected($address['firstname']);
       $lastname = zen_output_string_protected($address['lastname']);
@@ -120,6 +120,7 @@
 // TABLES: customers, address_book
   function zen_address_label($customers_id, $address_id = 1, $html = false, $boln = '', $eoln = "\n") {
     global $db;
+/* BOF TVA_INTRACOM 2 of 2 */
     $address_query = "select entry_firstname as firstname, entry_lastname as lastname,
                              entry_company as company, entry_tva_intracom as tva_intracom, entry_street_address as street_address,
                              entry_suburb as suburb, entry_city as city, entry_postcode as postcode,
@@ -127,7 +128,8 @@
                              entry_country_id as country_id
                       from " . TABLE_ADDRESS_BOOK . "
                       where customers_id = '" . (int)$customers_id . "'
-                      and address_book_id = '" . (int)$address_id . "'"; // TVA_INTRACOM
+                      and address_book_id = '" . (int)$address_id . "'";
+/* EOF TVA_INTRACOM 2 of 2 */
 
     $address = $db->Execute($address_query);
 

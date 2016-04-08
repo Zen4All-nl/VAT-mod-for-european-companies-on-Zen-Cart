@@ -61,6 +61,7 @@ function couponpopupWindow(url) {
         <td colspan="2"><?php echo zen_draw_separator(); ?></td>
       </tr>
 
+<?php /* BOF TVA_INTRACOM 1 of 3 */ ?>
 <?php
       $order_check = $db->Execute("select cc_cvv, customers_name, customers_company, customers_street_address,
                                     customers_suburb, customers_city, customers_postcode,
@@ -74,7 +75,8 @@ function couponpopupWindow(url) {
                                     payment_method, cc_type, cc_owner, cc_number, cc_expires, currency,
                                     currency_value, date_purchased, orders_status, last_modified
                              from " . TABLE_ORDERS . "
-                             where orders_id = '" . (int)$oID . "'"); // TVA_INTRACOM
+                             where orders_id = '" . (int)$oID . "'");
+<?php /* EOF TVA_INTRACOM 1 of 3 */ ?>
   $show_customer = 'false';
   if ($order_check->fields['billing_name'] != $order_check->fields['delivery_name']) {
     $show_customer = 'true';
@@ -108,13 +110,13 @@ function couponpopupWindow(url) {
           <tr>
             <td class="main"><?php echo '<a href="mailto:' . $order->customer['email_address'] . '">' . $order->customer['email_address'] . '</a>'; ?></td>
           </tr>
-<!-- TVA_INTRACOM BEGIN -->
+<?php /* BOF TVA_INTRACOM 2 of 3 */ ?>
           <?php if (zen_not_null($order_check->fields['billing_tva_intracom'])) { ?>
           <tr>
             <td class="main"><b><?php echo ENTRY_TVA_INTRACOM; ?></b> <?php echo $order_check->fields['billing_tva_intracom']; ?></td>
           </tr>
           <?php } ?>
-<!-- TVA_INTRACOM END -->
+<?php /* EOF TVA_INTRACOM 2 of 3 */ ?>
         </table></td>
         <td valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="2">
           <tr>
@@ -126,8 +128,8 @@ function couponpopupWindow(url) {
         </table></td>
       </tr>
     </table></td>
-  </tr>
-<!-- TVA_INTRACOM BEGIN -->
+<?php /* BOF TVA_INTRACOM 3 of 3 */ ?>
+
   <tr>
     <td><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
   </tr>
@@ -141,7 +143,7 @@ function couponpopupWindow(url) {
       </table>
     </td>
   </tr>
-<!-- TVA_INTRACOM END -->
+<?php /* EOF TVA_INTRACOM 3 of 3 */ ?>
   <tr>
     <td><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
   </tr>

@@ -12,7 +12,7 @@
   class ot_shipping {
     var $title, $output;
 
-    function ot_shipping() {
+    function __construct() {
       global $order, $currencies;
       $this->code = 'ot_shipping';
       $this->title = MODULE_ORDER_TOTAL_SHIPPING_TITLE;
@@ -40,7 +40,7 @@
       }
       $module = (isset($_SESSION['shipping']) && isset($_SESSION['shipping']['id'])) ? substr($_SESSION['shipping']['id'], 0, strpos($_SESSION['shipping']['id'], '_')) : '';
       if (is_object(($order)) && zen_not_null($order->info['shipping_method'])) {
-// TVA_INTRACOM REPLACE BEGIN
+/* BOF TVA_INTRACOM 1 of 3 */
 //        if ($GLOBALS[$module]->tax_class > 0) {
         $tva_tax = $order->customer['tva_intracom_tax'];
         if (!$tva_tax) {
@@ -49,7 +49,7 @@
         } else {
           $shipping_tax = zen_get_tax_rate($GLOBALS[$module]->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id']);
           $shipping_tax_description = zen_get_tax_description($GLOBALS[$module]->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id']);
-// TVA_INTRACOM REPLACE END
+/* EOF TVA_INTRACOM 1 of 3 */
           if (!isset($GLOBALS[$module]->tax_basis)) {
             $shipping_tax_basis = STORE_SHIPPING_TAX_BASIS;
           } else {
@@ -72,6 +72,7 @@
             } else {
               $shipping_tax = 0;
             }
+/* BOF TVA_INTRACOM 2 of 3 */
 /*          }
           $shipping_tax_amount = zen_calculate_tax($order->info['shipping_cost'], $shipping_tax);
           $order->info['shipping_tax'] += $shipping_tax_amount;
@@ -83,12 +84,13 @@
           if (DISPLAY_PRICE_WITH_TAX == 'true') $order->info['shipping_cost'] += zen_calculate_tax($order->info['shipping_cost'], $shipping_tax);
         }
 */
-        if ($_SESSION['shipping']['id'] == 'free_free') {
+/* EOF TVA_INTRACOM 2 of 3 */
+        if (isset($_SESSION['shipping']['id']) && $_SESSION['shipping']['id'] == 'free_free') {
           $order->info['shipping_method'] = FREE_SHIPPING_TITLE;
           $order->info['shipping_cost'] = 0;
         }
 
-// TVA_INTRACOM REPLACE BEGIN
+/* BOF TVA_INTRACOM 3 of 3 */
       }
     }
 $calculated_tax = zen_calculate_tax($order->info['shipping_cost'], $shipping_tax);
@@ -98,8 +100,7 @@ $order->info['tax_groups']["$shipping_tax_description"] += $calculated_tax;
 $order->info['total'] += $calculated_tax;
 }
           if (DISPLAY_PRICE_WITH_TAX == 'true') $order->info['shipping_cost'] += zen_calculate_tax($order->info['shipping_cost'], $shipping_tax);
-//} // if ($GLOBALS[$module]->tax_class > 0)
-// TVA_INTRACOM REPLACE END
+/* EOF TVA_INTRACOM 3 of 3 */
       }
     }
 

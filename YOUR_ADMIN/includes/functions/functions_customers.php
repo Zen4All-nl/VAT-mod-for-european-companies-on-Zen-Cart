@@ -40,9 +40,9 @@
 
     $address_format = $db->Execute($address_format_query);
     $company = zen_output_string_protected($address['company']);
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 1 of 1 */
     $tva_intracom = zen_output_string_protected($address['tva_intracom']);
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 1 of 1 */
     if (isset($address['firstname']) && zen_not_null($address['firstname'])) {
       $firstname = zen_output_string_protected($address['firstname']);
       $lastname = zen_output_string_protected($address['lastname']);

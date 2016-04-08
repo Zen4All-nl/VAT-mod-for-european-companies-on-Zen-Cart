@@ -1,16 +1,16 @@
 <?php
 /**
  * @package admin
- * @copyright Copyright 2003-2011 Zen Cart Development Team
+ * @copyright Copyright 2003-2016 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: order.php 18695 2011-05-04 05:24:19Z drbyte $
+ * @version $Id: Author: DrByte  Fri Jan 1 12:23:19 2016 -0500 Modified in v1.5.5 $
  */
 
-  class order {
+  class order extends base {
     var $info, $totals, $products, $customer, $delivery;
 
-    function order($order_id) {
+    function __construct($order_id) {
       $this->info = array();
       $this->totals = array();
       $this->products = array();
@@ -22,6 +22,7 @@
 
     function query($order_id) {
       global $db;
+/* BOF TVA_INTRACOM 1 of 2 */
       $order = $db->Execute("select cc_cvv, customers_name, customers_company, customers_street_address,
                                     customers_suburb, customers_city, customers_postcode, customers_id,
                                     customers_state, customers_country, customers_telephone,
@@ -36,7 +37,8 @@
                                     currency_value, date_purchased, orders_status, last_modified,
                                     order_total, order_tax, ip_address
                              from " . TABLE_ORDERS . "
-                             where orders_id = '" . (int)$order_id . "'"); // TVA_INTRACOM
+                             where orders_id = '" . (int)$order_id . "'");
+/* EOF TVA_INTRACOM 1 of 2 */
 
 
       $totals = $db->Execute("select title, text, class, value
@@ -47,8 +49,8 @@
       while (!$totals->EOF) {
         if ($totals->fields['class'] == 'ot_coupon') {
           $coupon_link_query = "SELECT coupon_id
-                  from " . TABLE_COUPONS . "
-                  where coupon_code ='" . zen_db_input($order->fields['coupon_code']) . "'";
+                                from " . TABLE_COUPONS . "
+                                where coupon_code ='" . zen_db_input($order->fields['coupon_code']) . "'";
           $coupon_link = $db->Execute($coupon_link_query);
           $zc_coupon_link = '<a href="javascript:couponpopupWindow(\'' . zen_catalog_href_link(FILENAME_POPUP_COUPON_HELP, 'cID=' . $coupon_link->fields['coupon_id']) . '\')">';
         }
@@ -104,9 +106,9 @@
 
       $this->billing = array('name' => $order->fields['billing_name'],
                              'company' => $order->fields['billing_company'],
-// TVA_INTRACOM BEGIN
+/* BOF TVA_INTRACOM 2 of 2 */
                               'tva_intracom' => $order->fields['billing_tva_intracom'],
-// TVA_INTRACOM END
+/* EOF TVA_INTRACOM 2 of 2 */
                              'street_address' => $order->fields['billing_street_address'],
                              'suburb' => $order->fields['billing_suburb'],
                              'city' => $order->fields['billing_city'],
@@ -158,7 +160,7 @@
 
         $subindex = 0;
         $attributes = $db->Execute("select products_options, products_options_values, options_values_price,
-                                           price_prefix,
+                                           price_prefix, products_options_values_id,
                                            product_attribute_is_free
                                     from " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . "
                                     where orders_id = '" . (int)$order_id . "'
@@ -167,6 +169,7 @@
           while (!$attributes->EOF) {
             $this->products[$index]['attributes'][$subindex] = array('option' => $attributes->fields['products_options'],
                                                                      'value' => $attributes->fields['products_options_values'],
+                                                                     'value_id' => $attributes->fields['products_options_values_id'],
                                                                      'prefix' => $attributes->fields['price_prefix'],
                                                                      'price' => $attributes->fields['options_values_price'],
                                                                      'product_attribute_is_free' =>$attributes->fields['product_attribute_is_free']);
@@ -178,5 +181,6 @@
         $index++;
         $orders_products->MoveNext();
       }
+      $this->notify('ORDER_QUERY_ADMIN_COMPLETE', array('orders_id' => $order_id));
     }
   }
